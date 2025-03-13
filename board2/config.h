@@ -1,0 +1,6 @@
+#define WIFI_SSID    "KUWIN-IOT"
+#define WIFI_PASS    ""
+#define MQTT_BROKER  "iot.cpe.ku.ac.th"
+#define MQTT_USER    "b6710504042"  
+#define MQTT_PASS    "pratinun.c@ku.th"      
+#define TOPIC_PREFIX "b6710504042"  

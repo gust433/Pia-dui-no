@@ -1,0 +1,597 @@
+[
+    {
+        "id": "38144f8b388f2426",
+        "type": "tab",
+        "label": "Flow 2",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "6a723f96880dbebf",
+        "type": "ui_text",
+        "z": "38144f8b388f2426",
+        "group": "bcfe4e4cf7a12f9a",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "name": "",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "col-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 1130,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "ef48788e21328b5f",
+        "type": "mqtt in",
+        "z": "38144f8b388f2426",
+        "name": "",
+        "topic": "b6710504042/note",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "065894a7d889c6f5",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 450,
+        "y": 320,
+        "wires": [
+            [
+                "baefcb314278da60",
+                "49c1d9c9ce5245cb"
+            ]
+        ]
+    },
+    {
+        "id": "c0dccff80f178aab",
+        "type": "ui_dropdown",
+        "z": "38144f8b388f2426",
+        "name": "",
+        "label": "",
+        "tooltip": "",
+        "place": "Select option",
+        "group": "0daf7d4cb2e5c734",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "",
+                "value": "C",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "Cm",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "D",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "Dm",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "E",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "Em",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "F",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "Fm",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "G",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "Gm",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "A",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "Am",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "B",
+                "type": "str"
+            },
+            {
+                "label": "",
+                "value": "Bm",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "",
+        "topicType": "str",
+        "className": "",
+        "x": 220,
+        "y": 520,
+        "wires": [
+            [
+                "a159eb831010033d"
+            ]
+        ]
+    },
+    {
+        "id": "a96762bbead99130",
+        "type": "ui_text",
+        "z": "38144f8b388f2426",
+        "group": "65a2bf66a4f0e30e",
+        "order": 1,
+        "width": "0",
+        "height": "0",
+        "name": "",
+        "label": "",
+        "format": "{{msg.chord}}",
+        "layout": "col-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 750,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "a159eb831010033d",
+        "type": "function",
+        "z": "38144f8b388f2426",
+        "name": "Choose Chord",
+        "func": "// ชื่อคอร์ดจะมาในรูปแบบของ msg.payload\nvar selectedChord = msg.payload;\n\n// กำหนดการแมปคอร์ดกับโน้ต\nvar chordMap = {\n    'C': ['C', 'E', 'G'],\n    'Cm': ['C', 'D#', 'G'],\n    'D': ['D', 'F#', 'A'],\n    'Dm': ['D', 'F', 'A'],\n    'E': ['E', 'G#', 'B'],\n    'Em': ['E', 'G', 'B'],\n    'F': ['F', 'A', 'C'],\n    'Fm': ['F', 'G#', 'C'],\n    'G': ['G', 'B', 'D'],\n    'Gm': ['G', 'A#', 'D'],\n    'A': ['A', 'C#', 'E'],\n    'Am': ['A', 'C', 'E'],\n    'B': ['B', 'D#', 'F#'],\n    'Bm': ['B', 'D', 'F#']\n\n};\n\nvar previousRandom = context.get('isRandomMode') || false;\n\nif (selectedChord === \"Correct\" && previousRandom){\n    selectedChord = \"random\";\n}\nvar chordKeys = Object.keys(chordMap);\nif ( !chordMap[selectedChord] || selectedChord === \"random\"){\n    selectedChord = chordKeys[Math.floor(Math.random()*chordKeys.length)]\n    context.set('isRandomMode', true);\n}else {\n    context.set('isRandomMode', false);\n}\n\n// ตั้งค่าโน้ตตามคอร์ดที่เลือก\nvar chordNotes = chordMap[selectedChord] || [];\n\n// เก็บข้อมูลคอร์ดและโน้ตไว้ในบริบท (context) เพื่อใช้ในการตรวจสอบภายหลัง\ncontext.set('currentChord', selectedChord);\ncontext.set('expectedNotes', chordNotes);\n\n// ส่งข้อมูลออกไป\nmsg.chord = selectedChord;\nmsg.notes = chordNotes;\nmsg.payload = \"Chord \" + selectedChord + \"  : \" + chordNotes.join(\", \");\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 440,
+        "wires": [
+            [
+                "565ef3f1eee48089",
+                "0e60bfcd7d011a52",
+                "d581bb4386e21e27",
+                "d235ac2e4e25c7b2"
+            ]
+        ]
+    },
+    {
+        "id": "565ef3f1eee48089",
+        "type": "change",
+        "z": "38144f8b388f2426",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "chord",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 540,
+        "y": 440,
+        "wires": [
+            [
+                "baefcb314278da60",
+                "a96762bbead99130"
+            ]
+        ]
+    },
+    {
+        "id": "baefcb314278da60",
+        "type": "function",
+        "z": "38144f8b388f2426",
+        "name": "CHECK note",
+        "func": "// รับโน้ตที่ได้รับจาก MQTT\nvar receivedNote = msg.payload;\n\n// รับข้อมูลโน้ตที่เก็บไว้\nvar receivedNotes = context.get('receivedNotes') || {};\nvar timeWindow = 500; // 500ms window\nvar currentTime = new Date().getTime();\n\n// เพิ่มโน้ตใหม่เข้าไป\nreceivedNotes[receivedNote] = currentTime;\n\n// ลบโน้ตเก่าที่เกินช่วงเวลา\nObject.keys(receivedNotes).forEach(function (note) {\n    if (currentTime - receivedNotes[note] > timeWindow) {\n        delete receivedNotes[note];\n    }\n});\n\n// อัปเดตโน้ตที่ได้รับ\ncontext.set('receivedNotes', receivedNotes);\n\n// รับโน้ตที่คาดหวัง\nvar expectedNotes = context.get('expectedNotes') || [];\nvar currentChord = context.get('currentChord') || '';\n\n// แปลงโน้ตที่ได้รับเป็นอาร์เรย์\nvar receivedNoteArray = Object.keys(receivedNotes);\n\n// ตรวจสอบว่ามีโน้ตที่คาดหวังทั้งหมดหรือไม่\nvar allExpectedPresent = expectedNotes.every(function (note) {\n    return receivedNoteArray.includes(note);\n});\n\n// ตรวจสอบว่ามีโน้ตที่ไม่คาดหวังหรือไม่\nvar anyUnexpected = receivedNoteArray.some(function (note) {\n    return !expectedNotes.includes(note);\n});\n\n// ตัดสินผล\nvar result = \"\";\nif (msg.chord) {\n    context.set('currentChord', msg.chord);\n    context.set('expectedNotes', msg.notes);\n    return null; \n} else {\n    if (expectedNotes.length === 0) {\n        result = \"ยังไม่ได้เลือกคอร์ด\";\n    } else if (allExpectedPresent && !anyUnexpected) {\n        result = \"Correct\";\n    } else {\n        result = \"Wrong\";\n        }\n}\n// ส่งผลลัพธ์ออกไป\nmsg.payload = result;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 320,
+        "wires": [
+            [
+                "a5ceda02a48719e4"
+            ]
+        ]
+    },
+    {
+        "id": "a5ceda02a48719e4",
+        "type": "switch",
+        "z": "38144f8b388f2426",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "Correct",
+                "vt": "str"
+            },
+            {
+                "t": "neq",
+                "v": "Correct",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 870,
+        "y": 320,
+        "wires": [
+            [
+                "6a723f96880dbebf",
+                "fc2b4c16ffe9997f",
+                "42c7def62ec879a6",
+                "90c271039d88c9e3",
+                "673bb4480c96b210"
+            ],
+            [
+                "6a723f96880dbebf",
+                "fc2b4c16ffe9997f",
+                "90c271039d88c9e3",
+                "42c7def62ec879a6"
+            ]
+        ]
+    },
+    {
+        "id": "49c1d9c9ce5245cb",
+        "type": "function",
+        "z": "38144f8b388f2426",
+        "name": "note",
+        "func": "var receivedNote = msg.payload;\nvar receivedNotes = context.get('receivedNotes') || {};\nvar timeWindow = 500; // 500ms window\nvar currentTime = new Date().getTime();\nreceivedNotes[receivedNote] = currentTime;\nObject.keys(receivedNotes).forEach(function (note) {\n    if (currentTime - receivedNotes[note] > timeWindow) {\n        delete receivedNotes[note];\n    }\n});\ncontext.set('receivedNotes', receivedNotes);\nvar receivedNoteArray = Object.keys(receivedNotes);\nvar result = \"\";\nresult += \"\\nคุณเล่นโน้ต: \" + receivedNoteArray.join(\", \");\nmsg.payload = result;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 240,
+        "wires": [
+            [
+                "8d41e115156d98f4"
+            ]
+        ]
+    },
+    {
+        "id": "8d41e115156d98f4",
+        "type": "ui_text",
+        "z": "38144f8b388f2426",
+        "group": "bcfe4e4cf7a12f9a",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": ">>>",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 790,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "fc2b4c16ffe9997f",
+        "type": "mqtt out",
+        "z": "38144f8b388f2426",
+        "name": "",
+        "topic": "b6710504042/display/text",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "065894a7d889c6f5",
+        "x": 1190,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "42c7def62ec879a6",
+        "type": "mqtt out",
+        "z": "38144f8b388f2426",
+        "name": "",
+        "topic": "b6710504042/led/green",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "065894a7d889c6f5",
+        "x": 1190,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "90c271039d88c9e3",
+        "type": "mqtt out",
+        "z": "38144f8b388f2426",
+        "name": "",
+        "topic": "b6710504042/led/red",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "065894a7d889c6f5",
+        "x": 1180,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "082d8b43b78795e1",
+        "type": "function",
+        "z": "38144f8b388f2426",
+        "name": "ส่งโน๊ตที่ต้องกดออกไปที่led",
+        "func": "// รับโน้ตจากคอร์ดที่เลือก\nvar chordNotes = msg.notes || [];\nvar topic = \"b6710504042/n\"; // MQTT topic ที่จะส่งไป\nvar outputMsgs = [];\n\n// วนลูปส่งแต่ละโน้ตไปที่ MQTT\nchordNotes.forEach(function(note) {\n    outputMsgs.push({\n            payload: note,\n                    topic: topic\n                        });\n                        });\n\n                        // ส่งออกไป\n                        return [outputMsgs];\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 580,
+        "wires": [
+            [
+                "48d32ad6bd55b412"
+            ]
+        ]
+    },
+    {
+        "id": "0e60bfcd7d011a52",
+        "type": "function",
+        "z": "38144f8b388f2426",
+        "name": "ส่งชื่อคอร์ด",
+        "func": "var selectedChord = msg.chord ||\"\";\nmsg.payload = selectedChord ;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 640,
+        "wires": [
+            [
+                "c669e40d6148b9f7"
+            ]
+        ]
+    },
+    {
+        "id": "673bb4480c96b210",
+        "type": "delay",
+        "z": "38144f8b388f2426",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1000",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 840,
+        "y": 380,
+        "wires": [
+            [
+                "a159eb831010033d",
+                "48d32ad6bd55b412"
+            ]
+        ]
+    },
+    {
+        "id": "d581bb4386e21e27",
+        "type": "function",
+        "z": "38144f8b388f2426",
+        "name": "Change chord",
+        "func": "msg.payload = \"RESET\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 520,
+        "wires": [
+            [
+                "48d32ad6bd55b412"
+            ]
+        ]
+    },
+    {
+        "id": "d235ac2e4e25c7b2",
+        "type": "delay",
+        "z": "38144f8b388f2426",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "10",
+        "timeoutUnits": "milliseconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 550,
+        "y": 580,
+        "wires": [
+            [
+                "082d8b43b78795e1"
+            ]
+        ]
+    },
+    {
+        "id": "48d32ad6bd55b412",
+        "type": "mqtt out",
+        "z": "38144f8b388f2426",
+        "name": "",
+        "topic": "b6710504042/n",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "065894a7d889c6f5",
+        "x": 1080,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "c669e40d6148b9f7",
+        "type": "mqtt out",
+        "z": "38144f8b388f2426",
+        "name": "",
+        "topic": "b6710504042/chord",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "065894a7d889c6f5",
+        "x": 720,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "bcfe4e4cf7a12f9a",
+        "type": "ui_group",
+        "name": "Your note",
+        "tab": "e56d6783c9df8288",
+        "order": 3,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "065894a7d889c6f5",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "iot.cpe.ku.ac.th",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "0daf7d4cb2e5c734",
+        "type": "ui_group",
+        "name": "Menu",
+        "tab": "e56d6783c9df8288",
+        "order": 4,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "65a2bf66a4f0e30e",
+        "type": "ui_group",
+        "name": "Note",
+        "tab": "e56d6783c9df8288",
+        "order": 1,
+        "disp": true,
+        "width": "10",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "e56d6783c9df8288",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
